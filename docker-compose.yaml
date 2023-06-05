@@ -1,0 +1,27 @@
+version: "3"
+services:
+  leber:
+    container_name: leber
+    restart: always
+    build: ./docker/php
+    volumes:
+      - ./xhprof:/php/xhprof/data
+      - ./:/var/www/html/leber
+    environment:
+      - VIRTUAL_HOST=leber.local
+      - VIRTUAL_PROTO=fastcgi
+      - VIRTUAL_PORT=9000
+      - VIRTUAL_ROOT=/var/www/html/leber/public
+    working_dir: /var/www/html/leber
+    ports:
+      - "3035:3027"
+      - "3033:3034"
+    extra_hosts:
+      - "leber.local:172.17.0.1"
+    networks:
+      - devserver_default
+volumes:
+  nginx:
+networks:
+  devserver_default:
+    external: true

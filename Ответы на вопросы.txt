@@ -1,0 +1,77 @@
+Задание 1: PHP
+Как называется механизм повторного использования кода в PHP? Как и для чего вы его использовали?
+
+Ответ: В PHP и в Laravel в частности это можно сделать несколькими путями, но основной механизм, созданный авторами языка, называется трейтами (Traits).
+
+Задание 2: PhpSpreadsheet
+Загрузите библиотеку PhpSpreadsheet и создайте с её помощью любой excel (xlsx) документ, заполнив скриптом несколько ячеек со своими фамилией, именем и адресом e-mail.
+
+Ответ: см. public/PhpSpreadsheet/CreateXlsx.php
+
+Задание 3: Watermark
+Создайте PHP-скрипт, который будет накладывать водяной знак на PNG и JPG файлы. В случае с PNG прозрачность исходного изображения должна сохраняться.
+PNG: https://office.leber.ru:1147/sharing/caty9aABc
+JPG: https://office.leber.ru:1147/sharing/kgelbt88h
+Watermark: https://office.leber.ru:1147/sharing/cdOuCvZbn
+
+Ответ: см. public/Watermark/AddWatermark.php (добавляет водяной знак в правый нижний угол)
+
+Задание 4: CLI
+Как получить аргумент переданный в PHP-скрипт с помощью командной строки?
+
+Ответ: С помощью переменной $argv, которая является глобальным массивом. Каждый элемент этого массива является аргументом, переданным в командной строке.
+
+Задание 5: Laravel
+Как в Laravel защитить route авторизацией по токену одной строкой кода?
+
+Ответ: Для этого нужно подключить middleware SANCTUM перед описанием роутов. Например:
+Route::middleware('auth:sanctum')->patch('/user/{user}', [UserController:class, 'update']);
+
+Как в модели Laravel указать на связь “один ко многим”?
+
+Ответ: Нужно создать метод, который опишет это отношение с помощью метода hasMany(). Для описания обратной связи в соответствующей таблице нужно описать метод, использующий belongsTo().
+Например, у нас есть модель продуктов (Product) и модель торговых предложений (Proposals). Один продукт может иметь множество торговых предложений, но у каждого предложения есть связь только с одним продуктом. Тогда связь в модели Product будет выглядеть следующим образом:
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Product extends Model
+{
+    use HasFactory;
+
+    public function proposals(): HasMany
+    {
+        return $this->hasMany(Proposal::class);
+    }
+}
+
+А модель Proposal - вот так:
+
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Proposal extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ['*'];
+
+    public function product(): BelongsToMany
+    {
+        return $this
+            ->belongsTo(Product::class);
+    }
+}
+
+P.S. Стандартом нейминга для связей один-ко-многим и многие-ко-многим является название модели во множественном числе (proposals), а для связей один-к-одному и обратной связи один-ко-многим - в единственном числе (product).
+
